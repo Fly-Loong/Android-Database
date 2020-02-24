@@ -4,6 +4,7 @@
 Introduction
 ====
 This is an Android Database library for easy using database.
+If it helps you, please do me a favour to give a Star or Fork it :), thanks.
 
 How to include the library into your project
 ====
