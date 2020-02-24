@@ -33,6 +33,10 @@ Next is some quick guide.
 
 1. Create you own table and table item class.(Ref TestTable.java and TestEntity.java file)
 -------
+@Table gives the table name
+@Column gives the field/column name in table. If the class field does not have it, the field will not be in table
+Attention, only support Integer, Long, Boolean, Float, Double, String, byte[] types.
+
 ```
 @Table("test_t")
 public class TestEntity extends BaseEntity {
@@ -59,6 +63,7 @@ public class TestEntity extends BaseEntity {
     private byte[] blobValue;
 }
 ```
+
 ```
 public class TestTable extends BaseTable<TestEntity> {
     public TestTable(Database database) {
