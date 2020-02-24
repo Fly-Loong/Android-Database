@@ -3,7 +3,7 @@
 
 Introduction
 ====
-This is an Android Database library for easy using database.
+This is an Android Database library for easy using database.<br>
 If it helps you, please do me a favour to give a Star or Fork it :), thanks.
 
 How to include the library into your project
@@ -28,13 +28,13 @@ How to include the library into your project
 
 How to use it
 ====
-You can check the detailed sample code in test app. 
+You can check the detailed sample code in test app. <br>
 Next is some quick guide.
 
 1. Create you own table and table item class.(Ref TestTable.java and TestEntity.java file)
 -------
-@Table gives the table name
-@Column gives the field/column name in table. If the class field does not have it, the field will not be in table
+@Table gives the table name<br>
+@Column gives the field/column name in table. If the class field does not have it, the field will not be in table<br>
 Attention, only support Integer, Long, Boolean, Float, Double, String, byte[] types.
 
 ```
@@ -175,7 +175,7 @@ List<TestEntity> entityList = table.rawQuery(
 	new String[]{"0", "200", "this is a test%"});
 ```
 
-More detailed info can be get from the code and test code.
+More detailed info can be get from the code and test code.<br>
 
 4. Attention
 -------
