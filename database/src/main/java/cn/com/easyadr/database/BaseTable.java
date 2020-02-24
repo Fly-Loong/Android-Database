@@ -22,6 +22,7 @@ public abstract class BaseTable<T extends BaseEntity>{
     private FieldInfo[] fields;
     private Class<T> entityClass;
 
+    @SuppressWarnings("unchecked")
     public BaseTable(Database database){
         this.database = database;
         try {

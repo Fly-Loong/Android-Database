@@ -5,6 +5,26 @@ Introduction
 ====
 This is an Android Database library for easy using database.
 
+How to include the library into your project
+====
+1. Add maven repository
+   In the main build.gradle file, add
+```
+	repositories {
+        google()
+        jcenter()
+        maven {
+            url "https://raw.githubusercontent.com/Fly-Loong/maven/master"
+        }
+    }
+```
+
+2. Add library dependence in the project build.gradle file
+```
+	implementation 'cn.com.easyadr:database:1.0.0'
+```
+
+
 How to use it
 ====
 You can check the detailed sample code in test app. 

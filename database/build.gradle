@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
 
 android {
     compileSdkVersion 28
@@ -23,4 +24,17 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+// run gradlew :database:uploadArchives
+uploadArchives {
+    repositories.mavenDeployer {
+        def mavenDirPath = file(project.rootDir.absolutePath + "/maven")
+        repository(url: "file://${mavenDirPath.absolutePath}")
+        pom.project {
+            groupId "cn.com.easyadr"
+            artifactId "database"
+            version "1.0.0"
+        }
+    }
 }
