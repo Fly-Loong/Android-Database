@@ -1,7 +1,6 @@
 package cn.com.easyadr.database;
 
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.lang.reflect.Field;
@@ -119,10 +118,12 @@ public abstract class BaseTable<T extends BaseEntity>{
      * simplest find all items
      */
     public List<T> findAll(){
-        Cursor cursor = database.getReadableDatabase().rawQuery("select * from " + tableName, null);
-        return curorToItems(cursor);
+        return curorToItems(database.getReadableDatabase().rawQuery("select * from " + tableName, null));
     }
 
+    public Cursor<T> findAllCursor() {
+        return getCursorWrapper(database.getReadableDatabase().rawQuery("select * from " + tableName, null));
+    }
     /*
      * find items using sqLiteDatabase.rawQuery params
      * columns: columns in rawQuery
@@ -134,6 +135,14 @@ public abstract class BaseTable<T extends BaseEntity>{
      *         6. limit in rawQuery
      */
     public List<T> findWithColumns(String[] columns_, Object...args){
+        return curorToItems(findWithColumns_(columns_, args));
+    }
+
+    public Cursor<T> findCursorWithColumns(String[] columns_, Object...args){
+        return getCursorWrapper(findWithColumns_(columns_, args));
+    }
+
+    private android.database.Cursor findWithColumns_(String[] columns_, Object...args){
         SQLiteDatabase sqLiteDatabase = database.getReadableDatabase();
 
         String selection = args.length > 0 ? (String)args[0] : null;
@@ -143,10 +152,8 @@ public abstract class BaseTable<T extends BaseEntity>{
         String orderBy = args.length > 4 ? (String)args[4] : null;
         String limit = args.length > 5 ? (String)args[5] : null;
 
-        Cursor cursor = sqLiteDatabase.query(tableName, null, selection, selectionArgs, groupBy, having, orderBy, limit);
-        return curorToItems(cursor);
+        return sqLiteDatabase.query(tableName, null, selection, selectionArgs, groupBy, having, orderBy, limit);
     }
-
     /*
      * find items has same no-null value with filter
      * filter: selectionArgs are filter's no-null fields
@@ -156,6 +163,14 @@ public abstract class BaseTable<T extends BaseEntity>{
      *         4. limit in rawQuery
      */
     public List<T> findSameWith(T filter, Object...args){
+        return curorToItems(findSameWith_(filter, args));
+    }
+
+    public Cursor<T> findCursorSameWith(T filter, Object...args){
+        return getCursorWrapper(findSameWith_(filter, args));
+    }
+
+    private android.database.Cursor findSameWith_(T filter, Object...args){
         SQLiteDatabase sqLiteDatabase = database.getReadableDatabase();
 
         WhereClause whereClause = new WhereClause(filter, fields);
@@ -165,25 +180,30 @@ public abstract class BaseTable<T extends BaseEntity>{
         String orderBy = args.length > 2 ? (String)args[2] : null;
         String limit = args.length > 3 ? (String)args[3] : null;
 
-        Cursor cursor = sqLiteDatabase.query(tableName, null, whereClause.whereClause, whereClause.whereArgs, groupBy, having, orderBy, limit);
-        return curorToItems(cursor);
+        return sqLiteDatabase.query(tableName, null, whereClause.whereClause, whereClause.whereArgs, groupBy, having, orderBy, limit);
     }
-
     /*
      * same as SQLiteDatabase.rawQuery
      */
     public List<T> rawQuery(String sql, String[] selectionArgs){
-        sql = sql.replace("{table}", tableName);
-        return curorToItems(database.getReadableDatabase().rawQuery(sql, selectionArgs));
+        return curorToItems(rawQuery_(sql, selectionArgs));
     }
 
+    public Cursor<T> rawQueryCursor(String sql, String[] selectionArgs){
+        return getCursorWrapper(rawQuery_(sql, selectionArgs));
+    }
+
+    private android.database.Cursor rawQuery_(String sql, String[] selectionArgs){
+        sql = sql.replace("{table}", tableName);
+        return database.getReadableDatabase().rawQuery(sql, selectionArgs);
+    }
     /*
      * find the first one
      */
     public T findFirstOneWithColumns(String[] columns, String selection, String[] selectionArgs){
         SQLiteDatabase sqLiteDatabase = database.getReadableDatabase();
 
-        Cursor cursor = sqLiteDatabase.query(tableName, columns, selection, selectionArgs, null, null, null, "1");
+        android.database.Cursor cursor = sqLiteDatabase.query(tableName, columns, selection, selectionArgs, null, null, null, "1");
         List<T> ret = curorToItems(cursor);
         return ret.size() == 0 ? null: ret.get(0);
     }
@@ -195,7 +215,7 @@ public abstract class BaseTable<T extends BaseEntity>{
         SQLiteDatabase sqLiteDatabase = database.getReadableDatabase();
         WhereClause whereClause = new WhereClause(filter, fields);
 
-        Cursor cursor = sqLiteDatabase.query(tableName, null, whereClause.whereClause, whereClause.whereArgs, null, null, null, "1");
+        android.database.Cursor cursor = sqLiteDatabase.query(tableName, null, whereClause.whereClause, whereClause.whereArgs, null, null, null, "1");
         List<T> ret = curorToItems(cursor);
         return ret.size() == 0 ? null: ret.get(0);
     }
@@ -209,6 +229,14 @@ public abstract class BaseTable<T extends BaseEntity>{
      *         4. limit in rawQuery
      */
     public List<T> findLikeWith(T filter, Object...args){
+        return curorToItems(findLikeWith_(filter, args));
+    }
+
+    public Cursor<T> findCursorLikeWith(T filter, Object...args){
+        return getCursorWrapper(findLikeWith_(filter, args));
+    }
+
+    private android.database.Cursor findLikeWith_(T filter, Object...args){
         SQLiteDatabase sqLiteDatabase = database.getReadableDatabase();
 
         WhereLikeClause whereClause = new WhereLikeClause(filter, fields);
@@ -218,8 +246,7 @@ public abstract class BaseTable<T extends BaseEntity>{
         String orderBy = args.length > 2 ? (String)args[2] : null;
         String limit = args.length > 3 ? (String)args[3] : null;
 
-        Cursor cursor = sqLiteDatabase.query(tableName, null, whereClause.whereClause, whereClause.whereArgs, groupBy, having, orderBy, limit);
-        return curorToItems(cursor);
+        return sqLiteDatabase.query(tableName, null, whereClause.whereClause, whereClause.whereArgs, groupBy, having, orderBy, limit);
     }
 
     protected ContentValues toContentValue(T item) {
@@ -238,7 +265,7 @@ public abstract class BaseTable<T extends BaseEntity>{
         return contentValues;
     }
 
-    protected List<T> curorToItems(Cursor cursor) {
+    protected List<T> curorToItems(android.database.Cursor cursor) {
         ArrayList<T> ret = new ArrayList<>();
         if(cursor != null){
             try {
@@ -258,7 +285,7 @@ public abstract class BaseTable<T extends BaseEntity>{
         return ret;
     }
 
-    protected T cursorToItem(Cursor cursor){
+    protected T cursorToItem(android.database.Cursor cursor){
         T item = newEntity();
         int idIndex = cursor.getColumnIndex("id");
         if(idIndex >= 0){
@@ -336,6 +363,10 @@ public abstract class BaseTable<T extends BaseEntity>{
         } else if(value.getClass().getName().equals(DOUBLE)){
             values.put(key, (Double) value);
         }
+    }
+
+    private Cursor getCursorWrapper(android.database.Cursor cursor){
+        return cursor == null ? null : new Cursor<T>(this, cursor);
     }
 
     private static class FieldInfo {

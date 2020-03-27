@@ -3,25 +3,49 @@ package cn.com.easyadr.app;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import cn.com.easyadr.database.Database;
 import cn.com.easyadr.app.Database.TestEntity;
 import cn.com.easyadr.app.Database.TestTable;
+import cn.com.easyadr.database.Cursor;
 
 public class MainActivity extends AppCompatActivity {
     private Database database1;
     private Database database2;
     private TestTable table1;
     private TestTable table2;
+    private ListView listView;
+    private ListAdapter adapter;
+
+    private Cursor<TestEntity> cursor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        listView = findViewById(R.id.listView);
+        adapter = new ListAdapter();
+        listView.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(cursor != null){
+            cursor.close();
+            cursor = null;
+        }
     }
 
     @Override
@@ -33,6 +57,12 @@ public class MainActivity extends AppCompatActivity {
         recreateDB();
         testOnTable(table1);
         testOnTable(table2);
+        if(cursor != null){
+            cursor.close();
+            cursor = null;
+        }
+        cursor = table1.findAllCursor();
+        adapter.notifyDataSetChanged();
 
         Toast.makeText(this, "Test success", Toast.LENGTH_SHORT).show();
     }
@@ -210,4 +240,35 @@ public class MainActivity extends AppCompatActivity {
             throw new RuntimeException("find same with error");
         }
 ;    }
+
+    private class ListAdapter extends BaseAdapter {
+        @Override
+        public int getCount() {
+            return cursor == null ? 0: cursor.getCount();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            TestEntity testEntity = cursor.moveToPosition(i);
+            if(testEntity != null){
+                View retView = LayoutInflater.from(MainActivity.this).inflate(R.layout.test_list_item, viewGroup, false);
+                TextView str1TextView = retView.findViewById(R.id.str1);
+                str1TextView.setText(testEntity.getId() + ":" + testEntity.getIntValue() + ":" + testEntity.getLongValue() + ":" + testEntity.getBoolValue());
+                TextView str2TextView = retView.findViewById(R.id.str2);
+                str2TextView.setText(testEntity.getDoubleValue() + ":" + testEntity.getFloatValue() + ":" + testEntity.getStringValue());
+                return retView;
+            }
+            return null;
+        }
+    }
 }
