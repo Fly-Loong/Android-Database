@@ -84,19 +84,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void testOnTable(TestTable table){
         createTestEntities(table);
-        findAll(table);
-        editItems(table);
-        deleteItem(table);
-        findWithColumns(table);
-        findSameWith(table);
-        findLikeWith(table);
-        rawQuery(table);
+        //findAll(table);
+        //editItems(table);
+        //deleteItem(table);
+        //findWithColumns(table);
+        //findSameWith(table);
+        //findLikeWith(table);
+        //rawQuery(table);
     }
 
     private void createTestEntities(TestTable table){
         for(int i=0;i<50;i++) {
             TestEntity entity = new TestEntity();
-            entity.setIntValue(i + 2);
+            //entity.setIntValue(i + 2);
             entity.setLongValue(i + 2l);
             entity.setBoolValue(true);
             entity.setFloatValue(i + 18.678f);

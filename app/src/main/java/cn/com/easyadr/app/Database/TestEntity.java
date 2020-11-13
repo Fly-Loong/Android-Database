@@ -7,7 +7,7 @@ import cn.com.easyadr.database.annotation.Table;
 @Table("test_t")
 public class TestEntity extends BaseEntity {
 
-    @Column("f_int")
+    @Column(value = "f_int", defaultValue = "10")
     private Integer intValue;
 
     @Column("f_long")
@@ -22,7 +22,7 @@ public class TestEntity extends BaseEntity {
     @Column("f_double")
     private Double doubleValue;
 
-    @Column("f_string")
+    @Column(value = "f_string", isUnique = true)
     private String stringValue;
 
     @Column("f_blob")

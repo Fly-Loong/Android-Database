@@ -2,6 +2,7 @@ package cn.com.easyadr.database;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -42,20 +43,33 @@ public abstract class BaseTable<T extends BaseEntity>{
                 Column column = field.getAnnotation(Column.class);
                 if(column != null){
                     String columnName = column.value();
+                    String defaultValue = column.defaultValue();
+                    boolean isNotNull = column.isNotNull();
+                    boolean isUnique = column.isUnique();
                     String className = field.getType().getName();
                     checkFieldType(className, field.getName());
                     createTableSql += columnName;
                     if(className.equals(STRING)){
-                        createTableSql += " TEXT,";
+                        createTableSql += " TEXT";
                     }else if(isInteger(className)){
-                        createTableSql += " INTEGER,";
+                        createTableSql += " INTEGER";
                     } else if(isReal(className)){
-                        createTableSql += " REAL,";
+                        createTableSql += " REAL";
                     } else if(className.equals(BYTE_ARRAY)){
-                        createTableSql += " BLOB,";
+                        createTableSql += " BLOB";
                     } else {
                         throw new RuntimeException(className + "is not handled by BaseTable");
                     }
+                    if(isNotNull){
+                        createTableSql += " NOT NULL";
+                    }
+                    if(!TextUtils.isEmpty(defaultValue)){
+                        createTableSql += " DEFAULT " + defaultValue;
+                    }
+                    if(isUnique){
+                        createTableSql += " UNIQUE";
+                    }
+                    createTableSql += ",";
                     fieldList.add(new FieldInfo(columnName, field));
                     field.setAccessible(true);
                     hasField = true;
@@ -95,6 +109,14 @@ public abstract class BaseTable<T extends BaseEntity>{
     public void delete(long id) {
         SQLiteDatabase sqLiteDatabase = database.getWritableDatabase();
         sqLiteDatabase.delete(tableName, "id=?", new String[]{String.valueOf(id)});
+    }
+
+    /*
+     * clear table
+     */
+    public void clear() {
+        SQLiteDatabase sqLiteDatabase = database.getWritableDatabase();
+        sqLiteDatabase.execSQL("delete from " + tableName);
     }
 
     /*
