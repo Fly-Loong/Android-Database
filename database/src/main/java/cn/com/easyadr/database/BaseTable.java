@@ -89,18 +89,13 @@ public abstract class BaseTable<T extends BaseEntity>{
 
     /*
      *save item into db
-     * if id is null, create, and set id value back into item
-     * else update the no-null value in item
      */
-    public void save(T item){
+    public long save(T item){
         ContentValues contentValues = toContentValue(item);
         SQLiteDatabase sqLiteDatabase = database.getWritableDatabase();
-        if(item.getId() == null) {
-            Long ret = sqLiteDatabase.insert(tableName, null, contentValues);
-            item.setId(ret);
-        }else{
-            sqLiteDatabase.update(tableName,contentValues, "id=?", new String[]{String.valueOf(item.getId())});
-        }
+        long ret = sqLiteDatabase.replace(tableName, null, contentValues);
+        item.setId(ret);
+        return ret;
     }
 
     /*
